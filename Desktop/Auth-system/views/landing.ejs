@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ledgerly — Simple bookkeeping for small teams</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/landing.css">
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- NAVBAR                                                        -->
+<!-- ============================================================ -->
+<nav class="navbar">
+  <div class="nav-brand"><span class="dot"></span> Ledgerly</div>
+  <div class="nav-actions">
+    <a href="/login"  class="btn-ghost">Log in</a>
+    <a href="/signup" class="btn-solid">Get started</a>
+  </div>
+</nav>
+
+<!-- ============================================================ -->
+<!-- HERO                                                          -->
+<!-- ============================================================ -->
+<section class="hero">
+
+  <!-- Left: headline + CTA -->
+  <div class="hero-left">
+    <div class="eyebrow">Bookkeeping, simplified</div>
+    <h1>Know where every <em>rupee</em> goes.</h1>
+    <p>Ledgerly gives small teams a clear picture of their money — income, expenses, and everything in between. No spreadsheet chaos. No accountant required.</p>
+    <div class="hero-cta">
+      <a href="/signup" class="btn-hero">Create free account</a>
+      <a href="/login"  class="hero-link">Already have one?</a>
+    </div>
+  </div>
+
+  <!-- Right: dark panel with a mock dashboard preview -->
+  <div class="hero-right">
+    <div class="mock-card">
+      <div class="mock-card-label">Your balance this month</div>
+      <div class="mock-card-value">₹ 24,500.00</div>
+
+      <div class="mock-rows">
+        <div class="mock-row">
+          <span class="mock-row-desc">Freelance project</span>
+          <span class="mock-row-amount income">+ ₹18,000</span>
+        </div>
+        <div class="mock-row">
+          <span class="mock-row-desc">Office supplies</span>
+          <span class="mock-row-amount expense">− ₹1,200</span>
+        </div>
+        <div class="mock-row">
+          <span class="mock-row-desc">Client retainer</span>
+          <span class="mock-row-amount income">+ ₹12,000</span>
+        </div>
+        <div class="mock-row">
+          <span class="mock-row-desc">Server costs</span>
+          <span class="mock-row-amount expense">− ₹4,300</span>
+        </div>
+        <div class="mock-row">
+          <span class="mock-row-desc">Design tools</span>
+          <span class="mock-row-amount expense">− ₹</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- FEATURES                                                      -->
+<!-- ============================================================ -->
+<section class="features">
+
+  <div class="feature-card">
+    <div class="feature-number">01</div>
+    <h3>Track income and expenses</h3>
+    <p>Add records in seconds — description, amount, type, date. Every entry is tied to your account and visible the moment you log back in.</p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-number">02</div>
+    <h3>Role-based access control</h3>
+    <p>Admins can manage all users, assign roles, and oversee the full system. Regular users see only their own data — nothing more, nothing less.</p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-number">03</div>
+    <h3>Secure by default</h3>
+    <p>Passwords are hashed with bcrypt. Sessions use signed JWTs stored in httpOnly cookies. Your data stays yours.</p>
+  </div>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- STATS BAND                                                    -->
+<!-- ============================================================ -->
+<section class="stats-band">
+  <div class="stat-item">
+    <div class="stat-number">100%</div>
+    <div class="stat-label">Data ownership</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">2 min</div>
+    <div class="stat-label">To set up your account</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">₹0</div>
+    <div class="stat-label">To get started</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CTA SECTION                                                   -->
+<!-- ============================================================ -->
+<section class="cta-section">
+  <div class="cta-copy">
+    <h2>Ready to get your <em>books in order?</em></h2>
+    <p>Sign up in under two minutes. No credit card, no setup fee, no spreadsheet required.</p>
+  </div>
+  <a href="/signup" class="btn-cta">Start for free</a>
+</section>
+
+<!-- ============================================================ -->
+<!-- FOOTER                                                        -->
+<!-- ============================================================ -->
+<footer class="footer">
+  <div class="footer-brand"><span class="dot"></span> Ledgerly</div>
+  <div class="footer-copy">© 2026 Ledgerly. Built for small teams.</div>
+</footer>
+
+</body>
+</html>

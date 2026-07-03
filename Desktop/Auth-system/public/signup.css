@@ -1,0 +1,439 @@
+/* ============================================================ */
+/* signup.css — design tokens + layout + components               */
+/* Served as a static file from /public, linked in signup.ejs     */
+/* ============================================================ */
+
+/* ---------- Design tokens ---------- */
+:root {
+  --ink: #11141B;          /* near-black, left panel background */
+  --ink-soft: #1B1F29;     /* slightly lighter ink for cards on ink */
+  --bone: #F6F3EC;         /* warm off-white, right panel background */
+  --paper: #FFFFFF;
+  --accent: #C99A3B;       /* brass/gold — the one accent color */
+  --accent-soft: #E7CD8D;
+  --line: #DAD4C6;         /* hairline borders on bone */
+  --line-ink: #2C313D;     /* hairline borders on ink */
+  --text-ink: #ECEAE3;     /* body text on dark panel */
+  --text-muted-ink: #8C92A0;
+  --text-dark: #1C1E22;    /* body text on light panel */
+  --text-muted: #74706A;
+  --error: #C04A3F;
+  --success: #4E8B6B;
+  --radius: 2px;           /* sharp, editorial corners — not rounded */
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bone);
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Page shell: split screen ---------- */
+.shell {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+/* ---------- LEFT: brand / narrative panel ---------- */
+.brand-panel {
+  background: var(--ink);
+  color: var(--text-ink);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px 56px;
+  overflow: hidden;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted-ink);
+  z-index: 2;
+}
+
+.brand-mark .dot {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.brand-copy {
+  max-width: 420px;
+  z-index: 2;
+}
+
+.brand-copy h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: clamp(32px, 4vw, 44px);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  margin-bottom: 18px;
+}
+
+.brand-copy h1 em {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--accent-soft);
+}
+
+.brand-copy p {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-muted-ink);
+  max-width: 360px;
+}
+
+/* ---------- Signature element: progress rail ---------- */
+.progress-rail {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+}
+
+.progress-rail .rail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted-ink);
+  transition: color 0.3s ease;
+}
+
+.progress-rail .rail-item.done {
+  color: var(--text-ink);
+}
+
+.progress-rail .rail-marker {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--line-ink);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.3s ease, background 0.3s ease;
+  position: relative;
+}
+
+.progress-rail .rail-item.done .rail-marker {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.progress-rail .rail-marker::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.progress-rail .rail-item.done .rail-marker::after {
+  opacity: 1;
+}
+
+/* Decorative background arcs */
+.brand-panel::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  right: -160px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  border: 1px solid var(--line-ink);
+  z-index: 1;
+}
+
+.brand-panel::after {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -100px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  border: 1px solid var(--line-ink);
+  z-index: 1;
+}
+
+/* ---------- RIGHT: form panel ---------- */
+.form-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.form-wrap {
+  width: 100%;
+  max-width: 380px;
+}
+
+.form-wrap .eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.form-wrap h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 28px;
+  margin-bottom: 8px;
+  color: var(--text-dark);
+}
+
+.form-wrap .lede {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+.form-wrap .lede a {
+  color: inherit;
+  font-weight: 600;
+  border-bottom: 1px solid var(--accent);
+  text-decoration: none;
+}
+
+/* ---------- Field groups: underline style, floating label ---------- */
+.field {
+  position: relative;
+  margin-bottom: 26px;
+}
+
+.field input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-size: 15.5px;
+  color: var(--text-dark);
+  padding: 8px 30px 8px 2px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.field input::placeholder { color: transparent; }
+
+.field label {
+  position: absolute;
+  left: 2px;
+  top: 9px;
+  font-size: 15.5px;
+  color: var(--text-muted);
+  pointer-events: none;
+  transition: all 0.18s ease;
+}
+
+.field input:focus + label,
+.field input:not(:placeholder-shown) + label {
+  top: -14px;
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+}
+
+.field input:focus {
+  border-bottom-color: var(--accent);
+}
+
+.field input:focus + label {
+  color: var(--accent);
+}
+
+.field.is-valid input { border-bottom-color: var(--success); }
+.field.is-invalid input { border-bottom-color: var(--error); }
+
+.field .status-icon {
+  position: absolute;
+  right: 2px;
+  top: 9px;
+  width: 18px;
+  height: 18px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.field.is-valid .status-icon.icon-valid { opacity: 1; }
+.field.is-invalid .status-icon.icon-invalid { opacity: 1; }
+
+.field .toggle-visibility {
+  position: absolute;
+  right: 0;
+  top: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text-muted);
+  display: flex;
+}
+
+.field .toggle-visibility:hover { color: var(--text-dark); }
+
+.field.has-toggle .status-icon { display: none; }
+.field.has-toggle input { padding-right: 32px; }
+
+.error-text {
+  font-size: 12px;
+  color: var(--error);
+  margin-top: 6px;
+  min-height: 14px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ---------- Password strength meter ---------- */
+.strength-meter {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  height: 3px;
+}
+
+.strength-meter .seg {
+  flex: 1;
+  background: var(--line);
+  transition: background 0.25s ease;
+}
+
+.strength-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- Submit button ---------- */
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--ink);
+  color: var(--bone);
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.submit-btn:hover { background: #2A2F3A; }
+.submit-btn:active { transform: translateY(1px); }
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.form-wrap .fine-print {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 22px;
+  text-align: center;
+}
+
+.form-wrap .fine-print a {
+  color: var(--text-dark);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent);
+}
+
+/* Server-level error banner (e.g. "email already in use") */
+.form-error-banner {
+  display: none;
+  background: #FBEAE8;
+  border: 1px solid var(--error);
+  color: var(--error);
+  font-size: 13px;
+  padding: 10px 12px;
+  margin-bottom: 20px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ---------- Success state ---------- */
+.success-state {
+  display: none;
+  text-align: center;
+}
+
+.success-state .mark {
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--success);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.success-state h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.success-state p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* ---------- Responsive: collapse to single column ---------- */
+@media (max-width: 880px) {
+  .shell { grid-template-columns: 1fr; }
+
+  .brand-panel {
+    padding: 32px 28px;
+    min-height: 280px;
+  }
+
+  .brand-copy h1 { font-size: 26px; }
+  .brand-copy p { display: none; }
+  .progress-rail { display: none; }
+
+  .form-panel { padding: 36px 24px 56px; }
+}
+
+@media (max-width: 380px) {
+  .brand-copy h1 { font-size: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

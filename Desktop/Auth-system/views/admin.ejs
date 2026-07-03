@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Dashboard — Ledgerly</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+
+<%
+  const safeUser  = (typeof user  !== 'undefined' && user)  ? user  : null;
+  const safeUsers = (typeof users !== 'undefined' && Array.isArray(users)) ? users : [];
+  const isAdmin   = safeUser && safeUser.role === 'admin';
+
+  const totalUsers = safeUsers.length;
+  const adminCount = safeUsers.filter(u => u.role === 'admin').length;
+%>
+
+<!-- ============================================================ -->
+<!-- NAVBAR                                                        -->
+<!-- ============================================================ -->
+<nav class="navbar">
+  <div class="nav-brand"><span class="dot"></span> Ledgerly</div>
+
+  <ul class="nav-links">
+    <li><a href="/">Overview</a></li>
+    <li><a href="/admin" class="active nav-link-admin">Users</a></li>
+    <li><a href="#">Roles</a></li>
+    <li><a href="#">Settings</a></li>
+  </ul>
+
+  <div class="nav-actions">
+    <% if (safeUser && safeUser.role) { %>
+      <span class="role-badge role-badge--<%= safeUser.role %>">
+        <%= safeUser.role.charAt(0).toUpperCase() + safeUser.role.slice(1) %>
+      </span>
+    <% } %>
+    <div class="nav-avatar">
+      <%= safeUser && safeUser.name ? safeUser.name.charAt(0).toUpperCase() : '?' %>
+    </div>
+    <a href="/api/users/logout" class="logout-link">Log out</a>
+  </div>
+</nav>
+
+<!-- ============================================================ -->
+<!-- 403 GUARD                                                     -->
+<!-- ============================================================ -->
+<% if (!isAdmin) { %>
+  <div class="forbidden-page">
+    <div class="code">403</div>
+    <h1>Admin access only</h1>
+    <p>You don't have permission to view this page. This area is restricted to users with the <strong>admin</strong> role.</p>
+    <a href="/">Return to overview</a>
+  </div>
+<% } else { %>
+
+<!-- ============================================================ -->
+<!-- ADMIN DASHBOARD CONTENT                                       -->
+<!-- ============================================================ -->
+<div class="page-content">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="eyebrow">Admin Dashboard</div>
+    <h1>Manage users, roles, <em>and access.</em></h1>
+    <p>
+      Signed in as <strong><%= safeUser.name %></strong> &mdash; you have full read, write, and delete privileges across this system.
+    </p>
+  </section>
+
+  <!-- STAT CARDS -->
+  <div class="card-grid">
+
+    <div class="stat-card">
+      <div class="label">Total Users</div>
+      <div class="value"><%= totalUsers %></div>
+      <div class="delta"><%= totalUsers === 1 ? '1 account registered' : totalUsers + ' accounts registered' %></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="label">Admin Count</div>
+      <div class="value"><%= adminCount %></div>
+      <div class="delta <%= adminCount > 1 ? 'down' : '' %>">
+        <%= adminCount > 1 ? 'Multiple admins active' : 'Single admin' %>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="label">Active Sessions</div>
+      <div class="value">1</div>
+      <div class="delta up">Your session — live</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="label">System Status</div>
+      <div class="value" style="font-size:20px; padding-top:6px;">Active</div>
+      <div class="delta up">All systems operational</div>
+    </div>
+
+  </div>
+
+  <!-- USER MANAGEMENT TABLE -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>User Management</h2>
+      <span class="panel-header-meta"><%= totalUsers %> <%= totalUsers === 1 ? 'user' : 'users' %> total</span>
+    </div>
+
+    <% if (safeUsers.length === 0) { %>
+      <div class="empty-state">
+        <p>No users found in the system yet.</p>
+        <a href="#" class="ghost-btn">Invite first user</a>
+      </div>
+    <% } else { %>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% safeUsers.forEach(function(u, index) { %>
+
+              <!-- id="user-row-..." lets JS remove this row on delete -->
+              <tr id="user-row-<%= u.id %>">
+
+                <td class="td-email"><%= index + 1 %></td>
+
+                <td class="td-name"><%= u.name || '—' %></td>
+
+                <td class="td-email"><%= u.email || '—' %></td>
+
+                <td>
+                  <!-- id="role-badge-..." lets JS update badge text/color on role change -->
+                  <span class="role-badge role-badge--<%= u.role || 'user' %>" id="role-badge-<%= u.id %>">
+                    <%= u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : 'User' %>
+                  </span>
+                </td>
+
+                <td>
+                  <div class="td-actions">
+                    <select class="role-select" id="role-select-<%= u.id %>" aria-label="Change role for <%= u.name %>">
+                      <option value="user"  <%= u.role === 'user'  ? 'selected' : '' %>>User</option>
+                      <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                    </select>
+
+                    <button
+                      class="btn btn-update"
+                      onclick="handleRoleUpdate('<%= u.id %>', '<%= u.name %>')"
+                      aria-label="Update role for <%= u.name %>"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 1 0 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 4v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Update
+                    </button>
+
+                    <button
+                      class="btn btn-delete"
+                      onclick="handleDelete('<%= u.id %>', '<%= u.name %>')"
+                      aria-label="Delete <%= u.name %>"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5h6V4M6 7v5M10 7v5M3 4l1 9.5h8L13 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Delete
+                    </button>
+                  </div>
+                </td>
+
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+
+    <!-- Feedback bar shown after update/delete actions -->
+    <div class="rbac-result" id="tableResult"></div>
+  </div>
+
+  <!-- ROLE MANAGEMENT PANEL -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Role Management</h2>
+      <span class="panel-header-meta">2 roles configured</span>
+    </div>
+
+    <div class="role-rows">
+
+      <div class="role-row">
+        <div class="role-title">
+          <span class="role-badge role-badge--admin">Admin</span>
+        </div>
+        <p>Full system access. Can read, write, and delete any resource. Can manage other users and assign roles.</p>
+        <ul class="permission-list">
+          <li class="allowed">Read all records</li>
+          <li class="allowed">Write &amp; update records</li>
+          <li class="allowed">Delete records</li>
+          <li class="allowed">Manage users &amp; roles</li>
+          <li class="allowed">Access admin panel</li>
+        </ul>
+      </div>
+
+      <div class="role-row">
+        <div class="role-title">
+          <span class="role-badge role-badge--user">User</span>
+        </div>
+        <p>Standard account access. Can read their own data and manage their own profile. Cannot access admin areas.</p>
+        <ul class="permission-list">
+          <li class="allowed">Read own records</li>
+          <li class="denied">Write &amp; update records</li>
+          <li class="denied">Delete records</li>
+          <li class="denied">Manage users &amp; roles</li>
+          <li class="denied">Access admin panel</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RECENT ADMIN ACTIVITY -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Recent Admin Activity</h2>
+      <span class="panel-header-meta">Last 24 hours</span>
+    </div>
+
+    <div class="activity-row">
+      <div class="activity-desc">
+        <span class="activity-dot activity-dot--update"></span>
+        Role updated — <strong>Jane Smith</strong> promoted to Admin
+      </div>
+      <span class="activity-meta">2 min ago</span>
+    </div>
+
+    <div class="activity-row">
+      <div class="activity-desc">
+        <span class="activity-dot activity-dot--delete"></span>
+        User deleted — <strong>john_test@example.com</strong> removed from system
+      </div>
+      <span class="activity-meta">18 min ago</span>
+    </div>
+
+    <div class="activity-row">
+      <div class="activity-desc">
+        <span class="activity-dot activity-dot--login"></span>
+        Admin login — <strong><%= safeUser.email || 'admin' %></strong> authenticated via Auth0
+      </div>
+      <span class="activity-meta">Just now</span>
+    </div>
+  </div>
+
+  <!-- RBAC DEMO BUTTONS -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>RBAC Route Testing</h2>
+      <span class="panel-header-meta">UI demo only</span>
+    </div>
+
+    <div class="rbac-actions">
+      <button class="rbac-btn rbac-btn--admin" onclick="testRoute('admin')">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none"><path d="M9 1L11.5 6.5H17L12.5 10L14.5 16L9 12.5L3.5 16L5.5 10L1 6.5H6.5L9 1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        Test Admin Route
+      </button>
+
+      <button class="rbac-btn rbac-btn--user" onclick="testRoute('user')">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3.5" stroke="currentColor" stroke-width="1.5"/><path d="M2 16c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Test User Route
+      </button>
+    </div>
+
+    <div class="rbac-result" id="rbacResult"></div>
+  </div>
+
+</div><!-- /page-content -->
+
+<% } /* end isAdmin guard */ %>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT                                                    -->
+<!-- ============================================================ -->
+<script>
+
+  // ── UPDATE ROLE ─────────────────────────────────────────────
+  // Called when admin clicks "Update" button in the table
+  async function handleRoleUpdate(userId, userName) {
+
+    // Read the selected value from the dropdown for this row
+    const select = document.getElementById('role-select-' + userId);
+    const newRole = select.value;
+
+    try {
+      // PATCH /users/:id/role  →  { role: "admin" } or { role: "user" }
+      const response = await fetch('/api/users/' + userId + '/role', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update the visible badge in the table without a page reload
+        const badge = document.getElementById('role-badge-' + userId);
+        if (badge) {
+          badge.textContent = newRole.charAt(0).toUpperCase() + newRole.slice(1);
+          badge.className   = 'role-badge role-badge--' + newRole;
+        }
+        showTableResult('success', userName + ' is now <strong>' + newRole + '</strong>.');
+      } else {
+        showTableResult('error', data.msg || 'Could not update role.');
+      }
+
+    } catch (err) {
+      showTableResult('error', 'Could not reach the server. Try again.');
+    }
+  }
+
+
+  // ── DELETE USER ──────────────────────────────────────────────
+  // Called when admin clicks "Delete" button in the table
+  async function handleDelete(userId, userName) {
+
+    // Ask for confirmation first — no undo after this
+    if (!confirm('Delete ' + userName + '? This cannot be undone.')) return;
+
+    try {
+      // DELETE /users/:id
+      const response = await fetch('/api/users/' + userId, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Remove the row from the table without a page reload
+        const row = document.getElementById('user-row-' + userId);
+        if (row) row.remove();
+        showTableResult('success', userName + ' has been deleted.');
+      } else {
+        showTableResult('error', data.msg || 'Could not delete user.');
+      }
+
+    } catch (err) {
+      showTableResult('error', 'Could not reach the server. Try again.');
+    }
+  }
+
+
+  // ── FEEDBACK BANNER (shared by update + delete) ──────────────
+  function showTableResult(type, message) {
+    const el = document.getElementById('tableResult');
+    el.className = 'rbac-result rbac-result--' + (type === 'success' ? 'success' : 'error');
+    el.innerHTML =
+      (type === 'success'
+        ? '<svg width="15" height="15" viewBox="0 0 18 18" fill="none"><path d="M3 9.5L7 13L15 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> '
+        : '<svg width="15" height="15" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.3" stroke="currentColor" stroke-width="1.4"/><path d="M9 5.5V9.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="9" cy="12.4" r="0.9" fill="currentColor"/></svg> ')
+      + message;
+    el.style.display = 'flex';
+    setTimeout(() => { el.style.display = 'none'; }, 4000);
+  }
+
+
+  // ── RBAC DEMO BUTTONS ────────────────────────────────────────
+  function testRoute(type) {
+    const el = document.getElementById('rbacResult');
+    el.className = 'rbac-result rbac-result--success';
+    el.innerHTML = type === 'admin'
+      ? '<svg width="15" height="15" viewBox="0 0 18 18" fill="none"><path d="M3 9.5L7 13L15 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Admin route reachable — full read/write/delete scope confirmed.'
+      : '<svg width="15" height="15" viewBox="0 0 18 18" fill="none"><path d="M3 9.5L7 13L15 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> User route reachable — read-only scope confirmed.';
+    el.style.display = 'flex';
+    setTimeout(() => { el.style.display = 'none'; }, 4000);
+  }
+
+</script>
+
+</body>
+</html>

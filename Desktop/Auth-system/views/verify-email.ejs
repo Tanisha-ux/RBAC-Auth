@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verify Email — Ledgerly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/signup.css">
+</head>
+<body>
+<div class="shell">
+
+  <div class="brand-panel">
+    <div class="brand-mark"><span class="dot"></span> Ledgerly</div>
+    <div class="brand-copy">
+      <% if (success) { %>
+        <h1>You're <em>verified.</em></h1>
+        <p>Your email has been confirmed. You can now log in to your account.</p>
+      <% } else { %>
+        <h1>Something went <em>wrong.</em></h1>
+        <p>The verification link may have expired or already been used.</p>
+      <% } %>
+    </div>
+    <div></div>
+  </div>
+
+  <div class="form-panel">
+    <div class="form-wrap" style="text-align:center;">
+
+      <% if (success) { %>
+        <div style="margin-bottom:28px;">
+          <div style="width:56px; height:56px; border:1px solid #4E8B6B; border-radius:50%;
+                      display:flex; align-items:center; justify-content:center; margin: 0 auto 20px;">
+            <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
+              <path d="M3 9.5L7 13L15 5" stroke="#4E8B6B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2 style="font-family:'Fraunces',serif; font-size:24px; margin-bottom:8px;">Email verified</h2>
+          <p style="font-size:14px; color:#74706A; margin-bottom:28px;"><%= msg %></p>
+          <a href="/login" class="submit-btn" style="display:inline-block; text-decoration:none; text-align:center;">
+            Go to login
+          </a>
+        </div>
+      <% } else { %>
+        <div style="margin-bottom:28px;">
+          <div style="width:56px; height:56px; border:1px solid #C04A3F; border-radius:50%;
+                      display:flex; align-items:center; justify-content:center; margin: 0 auto 20px;">
+            <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="9" r="7.3" stroke="#C04A3F" stroke-width="1.4"/>
+              <path d="M9 5.5V9.8" stroke="#C04A3F" stroke-width="1.4" stroke-linecap="round"/>
+              <circle cx="9" cy="12.4" r="0.9" fill="#C04A3F"/>
+            </svg>
+          </div>
+          <h2 style="font-family:'Fraunces',serif; font-size:24px; margin-bottom:8px;">Verification failed</h2>
+          <p style="font-size:14px; color:#74706A; margin-bottom:28px;"><%= msg %></p>
+          <a href="/signup" class="submit-btn" style="display:inline-block; text-decoration:none; text-align:center;">
+            Sign up again
+          </a>
+        </div>
+      <% } %>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

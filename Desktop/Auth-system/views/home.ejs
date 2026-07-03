@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ledgerly — Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/home.css">
+</head>
+<body>
+
+<% const safeUser = (typeof user !== 'undefined' && user) ? user : null; %>
+<% const isAdmin = safeUser && safeUser.role === 'admin'; %>
+<% const permissions = isAdmin ? 'Read / Write / Delete' : 'Read'; %>
+
+<!-- ============================================================ -->
+<!-- NAVBAR                                                        -->
+<!-- ============================================================ -->
+<nav class="navbar">
+  <div class="nav-brand"><span class="dot"></span> Ledgerly</div>
+
+  <ul class="nav-links">
+    <li><a href="/" class="active">Overview</a></li>
+    <li><a href="#">Account</a></li>
+    <li><a href="#">Access Logs</a></li>
+    <li><a href="#">Settings</a></li>
+    <!-- Admin Panel link — only rendered when role === "admin" -->
+    <% if (isAdmin) { %>
+      <li><a href="/admin" class="nav-link-admin">Admin Panel</a></li>
+    <% } %>
+  </ul>
+
+  <div class="nav-actions">
+    <!-- Role badge sits beside the avatar -->
+    <% if (safeUser && safeUser.role) { %>
+      <span class="role-badge role-badge--<%= safeUser.role %>">
+        <%= safeUser.role.charAt(0).toUpperCase() + safeUser.role.slice(1) %>
+      </span>
+    <% } %>
+    <div class="nav-avatar">
+      <%= safeUser && safeUser.name ? safeUser.name.charAt(0).toUpperCase() : '?' %>
+    </div>
+    <a href="/api/users/logout" class="logout-link">Log out</a>
+  </div>
+</nav>
+
+<!-- ============================================================ -->
+<!-- HERO                                                          -->
+<!-- ============================================================ -->
+<section class="hero">
+  <div class="eyebrow">Secure Dashboard</div>
+  <h1>
+    Welcome back<% if (safeUser && safeUser.name) { %>, <em><%= safeUser.name.split(' ')[0] %></em><% } else { %>.<% } %>
+  </h1>
+  <p>You're signed in via Auth0. Your identity is verified, your role is enforced, and your access is scoped to what you're permitted to see and do.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- AUTH INFO SECTION                                             -->
+<!-- ============================================================ -->
+<div class="auth-info-grid" style="margin: 0 56px 40px;">
+  <div class="auth-info-card">
+    <div class="auth-info-row">
+      <span class="auth-info-label">Name</span>
+      <span class="auth-info-value"><%= safeUser && safeUser.name ? safeUser.name : '—' %></span>
+    </div>
+    <div class="auth-info-row">
+      <span class="auth-info-label">Email</span>
+      <span class="auth-info-value"><%= safeUser && safeUser.email ? safeUser.email : '—' %></span>
+    </div>
+    <div class="auth-info-row">
+      <span class="auth-info-label">Role</span>
+      <span class="auth-info-value">
+        <span class="role-badge role-badge--<%= safeUser && safeUser.role ? safeUser.role : 'user' %>">
+          <%= safeUser && safeUser.role ? safeUser.role.charAt(0).toUpperCase() + safeUser.role.slice(1) : 'User' %>
+        </span>
+      </span>
+    </div>
+    <div class="auth-info-row">
+      <span class="auth-info-label">Auth Provider</span>
+      <span class="auth-info-value auth0-badge">Auth0</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STAT CARDS — RBAC content                                     -->
+<!-- ============================================================ -->
+<div class="card-grid">
+
+  <div class="stat-card">
+    <div class="label">Role</div>
+    <div class="value" style="font-size: 22px; padding-top: 4px;">
+      <%= safeUser && safeUser.role ? safeUser.role.charAt(0).toUpperCase() + safeUser.role.slice(1) : 'Guest' %>
+    </div>
+    <div class="delta"><%= isAdmin ? 'Full system access' : 'Standard access' %></div>
+  </div>
+
+  <div class="stat-card">
+    <div class="label">Permissions</div>
+    <div class="value" style="font-size: 15px; line-height: 1.4; padding-top: 4px;"><%= permissions %></div>
+    <div class="delta <%= isAdmin ? 'up' : '' %>"><%= isAdmin ? 'Elevated privileges' : 'Read-only scope' %></div>
+  </div>
+
+  <div class="stat-card">
+    <div class="label">Last Login</div>
+    <div class="value" style="font-size: 18px; padding-top: 4px;">Just now</div>
+    <div class="delta up">Session active</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="label">Auth Provider</div>
+    <div class="value" style="font-size: 18px; padding-top: 4px;">Auth0</div>
+    <div class="delta">Identity verified</div>
+  </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- RBAC DEMO BUTTONS                                             -->
+<!-- ============================================================ -->
+<div class="panel" style="margin-bottom: 24px;">
+  <div class="panel-header">
+    <h2>Access Control Demo</h2>
+    <span class="panel-header-note">UI only — no backend routes wired</span>
+  </div>
+  <div class="rbac-actions">
+    <!-- Admin route button — only shown to admins -->
+    <% if (isAdmin) { %>
+      <button class="rbac-btn rbac-btn--admin" onclick="showAccessResult('admin')">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none"><path d="M9 1L11.5 6.5H17L12.5 10L14.5 16L9 12.5L3.5 16L5.5 10L1 6.5H6.5L9 1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        Access Admin Route
+      </button>
+    <% } else { %>
+      <!-- Non-admins see a disabled admin button that triggers 403 -->
+      <button class="rbac-btn rbac-btn--admin rbac-btn--disabled" onclick="show403()">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none"><path d="M9 1L11.5 6.5H17L12.5 10L14.5 16L9 12.5L3.5 16L5.5 10L1 6.5H6.5L9 1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        Access Admin Route
+      </button>
+    <% } %>
+
+    <!-- User route — accessible to everyone -->
+    <button class="rbac-btn rbac-btn--user" onclick="showAccessResult('user')">
+      <svg width="14" height="14" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3.5" stroke="currentColor" stroke-width="1.5"/><path d="M2 16c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Access User Route
+    </button>
+  </div>
+
+  <!-- RBAC result message, toggled by JS -->
+  <div class="rbac-result" id="rbacResult" style="display:none;"></div>
+
+  <!-- 403 block — hidden by default, revealed by JS when an unpermitted action is triggered -->
+  <div class="forbidden-block" id="forbiddenBlock" style="display:none;">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8.5" stroke="#C04A3F" stroke-width="1.5"/><path d="M10 6v5" stroke="#C04A3F" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="14" r="0.9" fill="#C04A3F"/></svg>
+    <div>
+      <strong>403 Forbidden</strong>
+      <p>You don't have permission to access this resource. This route requires the <code>admin</code> role.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- RECENT ACTIVITY PANEL (kept exactly as-was)                  -->
+<!-- ============================================================ -->
+<div class="panel" id="activityPanel">
+  <div class="panel-header">
+    <h2>Recent activity</h2>
+    <a href="#">View all</a>
+  </div>
+  <% if (typeof records !== 'undefined' && records.length > 0) { %>
+    <% records.forEach(function(record) { %>
+        <% const amountColor = record.type === 'income' ? 'var(--success)' : 'var(--error)'; %>
+        <% const amountSign  = record.type === 'income' ? '+' : '-'; %>
+
+        <div class="activity-row" id="record-row-<%= record.id %>">
+
+            <div class="record-left">
+                <span class="desc"><%= record.description %></span>
+                <!-- Admin sees who owns the record -->
+                <% if (isAdmin && record.owner_name) { %>
+                    <span class="record-owner">by <%= record.owner_name %></span>
+                <% } %>
+            </div>
+
+            <span class="meta"><%= new Date(record.date).toLocaleDateString() %></span>
+
+            <span class="amount" style="color:<%= amountColor %>; font-family:'JetBrains Mono',monospace; font-size:13.5px;">
+                <%= amountSign %> ₹<%= Number(record.amount).toLocaleString() %>
+            </span>
+
+            <div class="record-actions">
+                <button class="btn-record-edit" onclick="openEditModal(<%= record.id %>, '<%= record.description %>', '<%= record.amount %>', '<%= record.type %>', '<%= record.date.toISOString().split('T')[0] %>')">
+                    Edit
+                </button>
+                <button class="btn-record-delete" onclick="handleDeleteRecord(<%= record.id %>)">
+                    Delete
+                </button>
+            </div>
+
+        </div>
+    <% }); %>
+
+    <div class="activity-row" style="padding: 16px 26px;">
+        <button class="ghost-btn" onclick="openModal()">Add another record</button>
+    </div>
+
+<% } else { %>
+    <div class="empty-state" id="emptyState">
+        <p>Nothing here yet — once you start adding records, they'll show up in this list.</p>
+        <button class="ghost-btn" onclick="openModal()">Add your first record</button>
+    </div>
+<% } %>
+</div>
+
+
+
+<!-- RECORD MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+
+<div class="modal" id="recordModal">
+  <div class="modal-header">
+    <h2>New Record</h2>
+    <button class="modal-close" onclick="closeModal()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <form id="recordForm" onsubmit="handleAddRecord(event)">
+
+    <div class="modal-field">
+      <label for="recordDesc">Description</label>
+      <input type="text" id="recordDesc" placeholder="e.g. Office supplies" required />
+    </div>
+
+    <div class="modal-field">
+      <label for="recordAmount">Amount (₹)</label>
+      <input type="number" id="recordAmount" placeholder="e.g. 500" min="0" required />
+    </div>
+
+    <div class="modal-field">
+      <label for="recordType">Type</label>
+      <select id="recordType">
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+    </div>
+
+    <div class="modal-field">
+      <label for="recordDate">Date</label>
+      <input type="date" id="recordDate" required />
+    </div>
+
+    <div class="modal-result" id="modalResult"></div>
+
+    <button type="submit" class="submit-btn">Save Record</button>
+
+  </form>
+</div>
+
+
+<!-- EDIT RECORD MODAL -->
+<div class="modal-overlay" id="editModalOverlay" onclick="closeEditModal()"></div>
+
+<div class="modal" id="editModal">
+  <div class="modal-header">
+    <h2>Edit Record</h2>
+    <button class="modal-close" onclick="closeEditModal()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <form id="editForm" onsubmit="handleUpdateRecord(event)">
+    <input type="hidden" id="editRecordId" />
+
+    <div class="modal-field">
+      <label for="editDesc">Description</label>
+      <input type="text" id="editDesc" required />
+    </div>
+
+    <div class="modal-field">
+      <label for="editAmount">Amount (₹)</label>
+      <input type="number" id="editAmount" min="0" required />
+    </div>
+
+    <div class="modal-field">
+      <label for="editType">Type</label>
+      <select id="editType">
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+    </div>
+
+    <div class="modal-field">
+      <label for="editDate">Date</label>
+      <input type="date" id="editDate" required />
+    </div>
+
+    <div class="modal-result" id="editModalResult"></div>
+
+    <button type="submit" class="submit-btn">Save Changes</button>
+  </form>
+</div>
+
+
+<script>
+  // RBAC demo — UI only, no real routes
+
+  function openModal() {
+    document.getElementById('recordDate').valueAsDate = new Date();
+    document.getElementById('modalOverlay').style.display = 'block';
+    document.getElementById('recordModal').style.display  = 'flex';
+    document.getElementById('modalResult').style.display  = 'none';
+    document.getElementById('recordForm').reset();
+    document.getElementById('recordDate').valueAsDate = new Date();
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').style.display = 'none';
+    document.getElementById('recordModal').style.display  = 'none';
+  }
+
+  async function handleAddRecord(event) {
+    event.preventDefault();
+
+    const description   = document.getElementById('recordDesc').value.trim();
+    const amount = document.getElementById('recordAmount').value;
+    const type   = document.getElementById('recordType').value;
+    const date   = document.getElementById('recordDate').value;
+
+    // When you build the backend route (POST /api/records), 
+    // replace the mock below with a real fetch() call like this:
+    //
+    
+
+    const response = await fetch('/api/records', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ description, amount, type, date })
+});
+
+const data = await response.json();
+
+if (!response.ok) {
+    showModalResult('error', data.msg || 'Could not save record.');
+    return;
+}
+
+    closeModal();
+    addRecordToPanel(description, amount, type, date);
+    
+  }
+
+  function addRecordToPanel(description, amount, type, date) {
+    // Remove empty state if it's still showing
+    const emptyState = document.getElementById('emptyState');
+    if (emptyState) emptyState.remove();
+
+    const panel = document.getElementById('activityPanel');
+    const row = document.createElement('div');
+    row.className = 'activity-row';
+    row.innerHTML = `
+      <div class="record-left">
+            <span class="desc">${description}</span>
+        </div>
+        <span class="meta">${new Date(date).toLocaleDateString()}</span>
+        <span class="amount" style="font-family:'JetBrains Mono',monospace; font-size:13.5px; color:${type === 'income' ? 'var(--success)' : 'var(--error)'}">
+            ${type === 'income' ? '+' : '-'} ₹${Number(amount).toLocaleString()}
+        </span>
+        <div class="record-actions">
+            <button class="btn-record-edit">Edit</button>
+            <button class="btn-record-delete">Delete</button>
+        </div>
+    `;
+    const panelHeader = panel.querySelector('.panel-header');
+    panelHeader.insertAdjacentElement('afterend', row);
+  }
+
+
+
+  function showModalResult(type, message) {
+    const el = document.getElementById('modalResult');
+    el.textContent   = message;
+    el.style.display = 'block';
+    el.style.color   = type === 'success' ? 'var(--success)' : 'var(--error)';
+    el.style.fontFamily = "'JetBrains Mono', monospace";
+    el.style.fontSize   = '12.5px';
+    el.style.marginBottom = '12px';
+  }
+
+
+
+
+
+  function showAccessResult(type) {
+    const result = document.getElementById('rbacResult');
+    const forbidden = document.getElementById('forbiddenBlock');
+    forbidden.style.display = 'none';
+    result.style.display = 'flex';
+    if (type === 'admin') {
+      result.className = 'rbac-result rbac-result--success';
+      result.innerHTML = '<svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M3 9.5L7 13L15 5" stroke="#4E8B6B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>Admin route accessed — full read/write/delete scope granted.</span>';
+    } else {
+      result.className = 'rbac-result rbac-result--success';
+      result.innerHTML = '<svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M3 9.5L7 13L15 5" stroke="#4E8B6B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>User route accessed — read-only scope granted.</span>';
+    }
+  }
+
+  function show403() {
+    const result = document.getElementById('rbacResult');
+    const forbidden = document.getElementById('forbiddenBlock');
+    result.style.display = 'none';
+    forbidden.style.display = 'flex';
+  }
+
+
+
+  // Open edit modal and pre-fill with existing record data
+function openEditModal(id, description, amount, type, date) {
+    document.getElementById('editRecordId').value  = id;
+    document.getElementById('editDesc').value       = description;
+    document.getElementById('editAmount').value     = amount;
+    document.getElementById('editType').value       = type;
+    document.getElementById('editDate').value       = date;
+    document.getElementById('editModalResult').style.display = 'none';
+    document.getElementById('editModalOverlay').style.display = 'block';
+    document.getElementById('editModal').style.display       = 'flex';
+}
+
+function closeEditModal() {
+    document.getElementById('editModalOverlay').style.display = 'none';
+    document.getElementById('editModal').style.display        = 'none';
+}
+
+// Update record
+async function handleUpdateRecord(event) {
+    event.preventDefault();
+
+    const id          = document.getElementById('editRecordId').value;
+    const description = document.getElementById('editDesc').value.trim();
+    const amount      = document.getElementById('editAmount').value;
+    const type        = document.getElementById('editType').value;
+    const date        = document.getElementById('editDate').value;
+
+    try {
+        const response = await fetch(`/api/records/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ description, amount, type, date })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Update the row on the page without reload
+            const row = document.getElementById('record-row-' + id);
+            if (row) {
+                row.querySelector('.desc').textContent = description;
+                row.querySelector('.meta').textContent = new Date(date).toLocaleDateString();
+                const amountEl = row.querySelector('.amount');
+                amountEl.textContent = `${type === 'income' ? '+' : '-'} ₹${Number(amount).toLocaleString()}`;
+                amountEl.style.color = type === 'income' ? 'var(--success)' : 'var(--error)';
+            }
+            setTimeout(() => closeEditModal(), 1000);
+        } else {
+            const el = document.getElementById('editModalResult');
+            el.textContent = data.msg;
+            el.style.display = 'block';
+            el.style.color = 'var(--error)';
+            el.style.fontFamily = "'JetBrains Mono', monospace";
+            el.style.fontSize = '12.5px';
+        }
+
+    } catch (err) {
+        const el = document.getElementById('editModalResult');
+        el.textContent = 'Could not reach the server.';
+        el.style.display = 'block';
+        el.style.color = 'var(--error)';
+    }
+}
+
+// Delete record
+async function handleDeleteRecord(id) {
+    if (!confirm('Delete this record? This cannot be undone.')) return;
+
+    try {
+        const response = await fetch(`/api/records/${id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            const row = document.getElementById('record-row-' + id);
+            if (row) row.remove();
+        } else {
+            alert(data.msg);
+        }
+
+    } catch (err) {
+        alert('Could not reach the server.');
+    }
+}
+</script>
+
+</body>
+</html>
