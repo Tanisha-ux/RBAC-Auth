@@ -1,5 +1,6 @@
 
 const { Pool } = require("pg");
+const dotenv=require("dotenv");
 
 // const pool = new Pool({
 //   user: "postgres",
@@ -9,7 +10,7 @@ const { Pool } = require("pg");
 //   port: 5432,
 // });
 
-import dotenv from "dotenv";
+
 
 dotenv.config();
 
