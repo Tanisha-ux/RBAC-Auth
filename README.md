@@ -22,8 +22,7 @@ A full-stack authentication and RBAC system built from scratch with Node.js, Exp
 
 **1. Clone and install**
 ```bash
-git clone https://github.com/yourusername/ledgerly.git
-cd ledgerly
+git clone https://github.com/Tanisha-ux/ledgerly.git
 npm install
 ```
 
