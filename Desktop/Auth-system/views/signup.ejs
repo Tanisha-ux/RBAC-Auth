@@ -326,7 +326,7 @@ form.addEventListener('submit', async function (event) {
   try {
     // Matches the Express route: userRouter.post("/signup", userSignup)
     // mounted at app.use("/users", userRouter) -> POST /users/signup
-    const response = await fetch('http://localhost:3001/api/users/signup', {
+    const response = await fetch('/api/users/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
