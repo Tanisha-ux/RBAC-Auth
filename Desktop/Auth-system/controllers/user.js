@@ -48,7 +48,7 @@ async function userSignup(req, res) {
         );
 
         // Send verification email
-        await sendVerificationEmail(body.email, verificationToken);
+        // await sendVerificationEmail(body.email, verificationToken);
 
 
         res.status(201).json({
@@ -86,11 +86,11 @@ async function userLogin(req,res){
         const user=originalPass.rows[0];
 
         
-        if (!user.is_verified) {
-           return res.status(403).json({ 
-                msg: "Please verify your email before logging in. Check your inbox." 
-            });
-        }
+        // if (!user.is_verified) {
+        //    return res.status(403).json({ 
+        //         msg: "Please verify your email before logging in. Check your inbox." 
+        //     });
+        // }
 
         console.log("LOGIN USER:", user);
         
